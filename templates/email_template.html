@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Bus Pass {{ status }}</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f8f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      background: white;
+      width: 90%;
+      max-width: 500px;
+      margin: 30px auto;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    h2 {
+      color: #2e8b57;
+    }
+    p {
+      font-size: 15px;
+      color: #333;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 13px;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Bus Pass {{ status }} {% if status == 'Approved' %}✅{% else %}❌{% endif %}</h2>
+    <p>Dear {{ name }},</p>
+    <p>Your bus pass for route <b>{{ route_no }}</b> 
+    ({{ start_point }} → {{ end_point }}) has been <b>{{ status.lower() }}</b>.</p>
+
+    {% if status == 'Approved' %}
+    <p>Please collect your pass from the Transport Office within 3 working days.</p>
+    {% else %}
+    <p>We regret to inform you that your application has been rejected. For more details, please contact the Transport Office.</p>
+    {% endif %}
+
+    <p>Thank you for using our Bus Pass Management System!</p>
+
+    <div class="footer">
+      <p>— Transport Department</p>
+    </div>
+  </div>
+</body>
+</html>

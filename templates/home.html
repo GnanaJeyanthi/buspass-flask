@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div style="font-family: Arial, sans-serif; margin: 30px;">
+
+    <h1 style="text-align: center; color: #4B0082;">🎓 University Bus Pass Portal</h1>
+    <p style="text-align: center; font-size: 18px; color: #333;">
+        Efficient and transparent management of student bus passes.
+    </p>
+
+    <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; margin-top: 40px;">
+
+        <!-- Student Section -->
+        <div style="background-color: #E6E6FA; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
+            <h2 style="color: #4B0082;">👩‍🎓 For Students</h2>
+            <ul style="line-height: 1.6; font-size: 16px;">
+                <li>Register your details.</li>
+                <li>View available bus routes.</li>
+                <li>Apply for a bus pass easily.</li>
+                <li>Track your application status.</li>
+            </ul>
+        </div>
+
+        <!-- Admin Section -->
+        <div style="background-color: #F0FFF0; padding: 20px; border-radius: 10px; width: 300px; box-shadow: 0px 4px 8px rgba(0,0,0,0.1);">
+            <h2 style="color: #228B22;">🛠 For Admins</h2>
+            <ul style="line-height: 1.6; font-size: 16px;">
+                <li>Manage and update bus routes.</li>
+                <li>Approve or reject applications.</li>
+                <li>Monitor route capacities.</li>
+                <li>Prevent overcrowding on buses.</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <p style="text-align: center; font-style: italic; margin-top: 40px; color: gray;">
+        A simple portal to make bus pass management seamless for students and administrators.
+    </p>
+
+</div>
+
+{% endblock %}

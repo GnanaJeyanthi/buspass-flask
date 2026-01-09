@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Apply for Bus Pass</h2>
+<form method="POST">
+  <select name="route_id" required>
+    {% for r in routes %}
+    <option value="{{ r.id }}">{{ r.route_no }} - {{ r.start_point }} → {{ r.end_point }}</option>
+    {% endfor %}
+  </select><br><br>
+  <button type="submit">Apply</button>
+</form>
+{% endblock %}

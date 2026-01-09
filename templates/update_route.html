@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Update Route</h2>
+
+<form method="POST" action="{{ url_for('update_route', route_id=route.id) }}">
+    <label>Route No:</label>
+    <input type="text" name="route_no" value="{{ route.route_no }}" required><br><br>
+
+    <label>Start Point:</label>
+    <input type="text" name="start_point" value="{{ route.start_point }}" required><br><br>
+
+    <label>End Point:</label>
+    <input type="text" name="end_point" value="{{ route.end_point }}" required><br><br>
+
+    <label>Capacity:</label>
+    <input type="number" name="capacity" value="{{ route.capacity }}" required><br><br>
+
+    <button type="submit">Update Route</button>
+</form>
+
+<a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+{% endblock %}

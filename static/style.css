@@ -1,0 +1,24 @@
+body {
+    font-family: Arial;
+    background: #f8f8f8;
+    text-align: center;
+}
+form {
+    background: #fff;
+    padding: 20px;
+    margin: 30px auto;
+    display: inline-block;
+    border-radius: 8px;
+}
+button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+nav a {
+    margin: 10px;
+    text-decoration: none;
+}

@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Bus Pass Status</h2>
+{% if buspass %}
+<p>Status: {{ buspass.status }}</p>
+<p>Route: {{ buspass.route.route_no }} - {{ buspass.route.start_point }} → {{ buspass.route.end_point }}</p>
+{% else %}
+<p>No application found.</p>
+{% endif %}
+{% endblock %}

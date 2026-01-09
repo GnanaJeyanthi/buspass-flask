@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Update Bus Pass Status</h2>
+
+<p><strong>Application ID:</strong> {{ buspass.id }}</p>
+<p><strong>Student Name:</strong> {{ buspass.student.name }}</p>
+<p><strong>Route:</strong> {{ buspass.route.start_point }} → {{ buspass.route.end_point }}</p>
+<p><strong>Current Status:</strong> {{ buspass.status }}</p>
+
+<form method="POST">
+    <label for="status">New Status:</label>
+    <select name="status" id="status" required>
+        <option value="Applied" {% if buspass.status == 'Applied' %}selected{% endif %}>Applied</option>
+        <option value="Assigned" {% if buspass.status == 'Assigned' %}selected{% endif %}>Assigned</option>
+        <option value="Rejected" {% if buspass.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+    </select>
+    <br><br>
+    <button type="submit">Update Status</button>
+</form>
+
+<a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+
+{% endblock %}
