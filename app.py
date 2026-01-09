@@ -4,32 +4,31 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_bcrypt import Bcrypt
 from flask_login import (
-    LoginManager, UserMixin, login_user,
-    login_required, logout_user, current_user
+    LoginManager, UserMixin,
+    login_user, login_required,
+    logout_user, current_user
 )
 
 # -------------------------------------------------
 # APP CONFIG
 # -------------------------------------------------
-basedir = os.path.abspath(os.path.dirname(__file__))
-
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "secretkey")
 
-# 🔐 Security
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_secret_key')
-
-# 🗄 Database (SQLite inside instance/)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(
-    basedir, 'instance', 'buspass.db'
-)
+# Database (SQLite)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///buspass.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# 📧 Mail (from Render environment variables)
+# Mail config
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
-app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+app.config['MAIL_USERNAME'] = os.environ.get(
+    "MAIL_USERNAME", "jeyanthi282005@gmail.com"
+)
+app.config['MAIL_PASSWORD'] = os.environ.get(
+    "MAIL_PASSWORD", "efpk puwx zzrs wusp"
+)
 
 # -------------------------------------------------
 # EXTENSIONS
@@ -49,7 +48,7 @@ class User(UserMixin, db.Model):
     regno = db.Column(db.String(20), unique=True)
     name = db.Column(db.String(100))
     email = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
+    password = db.Column(db.String(200))
     role = db.Column(db.String(10), default='student')
     buspasses = db.relationship('BusPass', backref='student')
 
@@ -81,23 +80,13 @@ def load_user(user_id):
 def home():
     return render_template('home.html')
 
-
-# ---------------- AUTH ----------------
+# ---------------- REGISTER ----------------
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         password = bcrypt.generate_password_hash(
             request.form['password']
         ).decode('utf-8')
-
-        existing = User.query.filter(
-            (User.regno == request.form['regno']) |
-            (User.email == request.form['email'])
-        ).first()
-
-        if existing:
-            flash('Reg No or Email already exists')
-            return redirect(url_for('register'))
 
         user = User(
             name=request.form['name'],
@@ -107,12 +96,12 @@ def register():
         )
         db.session.add(user)
         db.session.commit()
-        flash('Registration successful. Please login.')
+        flash('Registration successful! Please login.')
         return redirect(url_for('login'))
 
     return render_template('register.html')
 
-
+# ---------------- USER LOGIN ----------------
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -134,7 +123,7 @@ def login():
 
     return render_template('login.html')
 
-
+# ---------------- LOGOUT ----------------
 @app.route('/logout')
 @login_required
 def logout():
@@ -152,7 +141,7 @@ def apply():
 
     if request.method == 'POST':
         if BusPass.query.filter_by(student_id=current_user.id).first():
-            flash('Already applied')
+            flash('You already applied')
             return redirect(url_for('status'))
 
         buspass = BusPass(
@@ -175,7 +164,26 @@ def status():
     ).first()
     return render_template('status.html', buspass=buspass)
 
-# ---------------- ADMIN ----------------
+# ---------------- ADMIN LOGIN ----------------
+@app.route('/admin_login', methods=['GET', 'POST'])
+def admin_login():
+    if request.method == 'POST':
+        user = User.query.filter_by(
+            email=request.form['email'],
+            role='admin'
+        ).first()
+
+        if user and bcrypt.check_password_hash(
+            user.password, request.form['password']
+        ):
+            login_user(user)
+            return redirect(url_for('admin_dashboard'))
+
+        flash('Invalid admin credentials')
+
+    return render_template('admin_login.html')
+
+# ---------------- ADMIN DASHBOARD ----------------
 @app.route('/admin_dashboard')
 @login_required
 def admin_dashboard():
@@ -190,37 +198,7 @@ def admin_dashboard():
         routes=routes
     )
 
-
-@app.route('/approve/<int:pass_id>')
-@login_required
-def approve(pass_id):
-    if current_user.role != 'admin':
-        return redirect(url_for('home'))
-
-    buspass = BusPass.query.get_or_404(pass_id)
-    buspass.status = 'Assigned'
-    db.session.commit()
-    send_email(buspass)
-    flash('Approved & email sent')
-    return redirect(url_for('admin_dashboard'))
-
-
-@app.route('/reject/<int:pass_id>')
-@login_required
-def reject(pass_id):
-    if current_user.role != 'admin':
-        return redirect(url_for('home'))
-
-    buspass = BusPass.query.get_or_404(pass_id)
-    buspass.status = 'Rejected'
-    db.session.commit()
-    send_email(buspass)
-    flash('Rejected & email sent')
-    return redirect(url_for('admin_dashboard'))
-
-# -------------------------------------------------
-# EMAIL
-# -------------------------------------------------
+# ---------------- EMAIL ----------------
 def send_email(buspass):
     student = User.query.get(buspass.student_id)
     route = Route.query.get(buspass.route_id)
@@ -240,9 +218,7 @@ def send_email(buspass):
     )
     mail.send(msg)
 
-# -------------------------------------------------
-# DB INIT
-# -------------------------------------------------
+# ---------------- DB INIT ----------------
 def create_tables():
     db.create_all()
 
@@ -264,13 +240,10 @@ def create_tables():
 
     db.session.commit()
 
-
 with app.app_context():
     create_tables()
     print("✅ DB ready & admin created")
 
-# -------------------------------------------------
-# START
-# -------------------------------------------------
+# ---------------- START ----------------
 if __name__ == "__main__":
-    app.run()
+    app.run(debug=True)
