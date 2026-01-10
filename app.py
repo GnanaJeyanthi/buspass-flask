@@ -13,10 +13,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] 
-import os
-app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
- # Replace with your app
+app.config['MAIL_USERNAME'] = 'jeyanthi282005@gmail.com' # Replace with your
+email
+app.config['MAIL_PASSWORD'] = 'irkm edgu tong cqbg' # Replace with your app
 password
 
 db = SQLAlchemy(app)
