@@ -4,6 +4,8 @@ from flask_mail import Mail, Message
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user,
 current_user
+import os
+
 
 app = Flask(_name_)
 app.secret_key = 'secretkey'
@@ -13,10 +15,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'jeyanthi282005@gmail.com' # Replace with your
-email
-app.config['MAIL_PASSWORD'] = 'irkm edgu tong cqbg' # Replace with your app
-password
+
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD') # Replace with your apppassword
 
 db = SQLAlchemy(app)
 mail = Mail(app)
