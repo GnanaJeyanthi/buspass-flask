@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_mail import Mail, Message
 from flask_bcrypt import Bcrypt
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+import os
 
 app = Flask(__name__)
 app.secret_key = 'secretkey'
@@ -13,8 +14,11 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'jeyanthi282005@gmail.com'  # Replace with your email
-app.config['MAIL_PASSWORD'] = 'irkm edgu tong cqbg'          # Replace with your app password
+
+
+app.config['MAIL_USERNAME'] = os.environ.get('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.environ.get('MAIL_PASSWORD')
+          # Replace with your app password
 
 db = SQLAlchemy(app)
 mail = Mail(app)
@@ -205,7 +209,6 @@ def delete_route(route_id):
     else:
         flash('Route not found!')
     return redirect(url_for('admin_dashboard'))
-
 @app.route('/approve/<int:pass_id>')
 @login_required
 def approve(pass_id):
@@ -213,20 +216,30 @@ def approve(pass_id):
         return redirect(url_for('home'))
 
     buspass = BusPass.query.get(pass_id)
-    route = Route.query.get(buspass.route_id)
+    if not buspass:
+        flash("Bus pass not found")
+        return redirect(url_for('admin_dashboard'))
 
-    # Count already assigned bus passes for this route
-    assigned_count = BusPass.query.filter_by(route_id=route.id, status='Assigned').count()
+    route = Route.query.get(buspass.route_id)
+    if not route:
+        flash("Route not found")
+        return redirect(url_for('admin_dashboard'))
+
+    assigned_count = BusPass.query.filter_by(
+        route_id=route.id,
+        status='Assigned'
+    ).count()
 
     if assigned_count < route.capacity:
         buspass.status = 'Assigned'
         db.session.commit()
         send_email(buspass)
-        flash('Bus pass approved and email sent!')
+        flash('Bus pass approved!')
     else:
-        flash(f'Cannot approve! Route {route.route_no} is full ({route.capacity} seats).')
-    
+        flash(f'Route {route.route_no} is full')
+
     return redirect(url_for('admin_dashboard'))
+
 
 @app.route('/reject/<int:pass_id>')
 @login_required
@@ -306,4 +319,4 @@ with app.app_context():
     print("✅ Tables created and default admin added (email: admin@gmail.com, password: admin123)")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
